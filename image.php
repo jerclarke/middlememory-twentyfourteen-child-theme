@@ -62,11 +62,6 @@ get_header();
 							echo '</ul>';
 						endif;
 ?>
-
-
-
-			<span class="attachment-tag-links"><?php print_r( get_the_terms() )?></span>
-
 					</div><!-- .entry-meta -->
 				</header><!-- .entry-header -->
 
