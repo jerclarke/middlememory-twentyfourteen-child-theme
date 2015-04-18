@@ -1,0 +1,117 @@
+/*GV-NEWS-CSS: Used for both gv-news-theme and gv-project-theme 
+Load it so that post summaries inside the map have all styles
+There are #geo-mashup styles built into gv-news.css*/
+/*@import url(https://s3.amazonaws.com/static.globalvoices/css/gv-news.css);*/
+
+
+.attachment-post-thumbnail {
+	width: 280px;
+	max-width: 100%;	
+	height: auto;
+}
+p.meta, h2 {
+	margin: 0;
+}
+h2 {
+	margin-bottom: .5em;
+	font-size: 1.25em;
+}
+h2 a {
+	margin-bottom: .5em;
+	color: #aaa;
+}
+
+.map-post-summary {
+	width: 280px;
+}
+.map-post-summary+.map-post-summary {
+	margin-top: .5em;
+	padding-top: .5em;
+	border-top: 1px solid #eee;
+	
+}
+.map-post-summary p {
+	margin-top: 0;
+	margin-bottom: .25em;
+}
+.map-post-permalink {
+	color: #aaa;
+}
+
+/**
+ * Most styles copied from /geo-mashup/css/map-style-default.css
+ * This file gets used instead
+ * Includes responsive styles
+ *
+ * Don't modify this file! It will be overwritten by upgrades.
+ * 
+ * Instead, copy this file to map-style.css in your theme directory
+ * or Geo Mashup Custom plugin directory, if you have that 
+ * installed. Those files take precedence over these default styles.
+ */
+
+/* Maps fill the frame, makes percentage height maps a bit easier */
+html, body { 
+	height: 100%; 
+	overflow: hidden; 
+	margin: 0;
+}
+
+/* Info window */
+.locationinfo { 
+	/*font-size:80%;*/
+	overflow:auto;
+	width:300px;
+	/*max-width: 80%;*/
+	/*height:150px;*/
+		/*max-width: 24rem;*/
+
+}
+
+/*Media Queries apply to the map, not the page the map
+is in, so the max-width numbers are small (i.e. widget width)*/
+@media
+only screen and (max-width:400px) {
+	.locationinfo {width: 200px;}
+}
+@media
+only screen and (max-width:300px) {
+	.locationinfo {width: 160px;}
+}
+
+/*Override GV responsive styles that hide 
+aspects of post summary at small sizes
+because their sizes don't work inside the map*/
+#geo-mashup .post-summary .contributor,
+#geo-mashup .post-summary .excerpt-entry,
+#geo-mashup .post-summary .postmeta {
+	display: inline-block;
+}
+
+/*back to default styles from the plugin*/
+
+.user-location-info {
+	/*font-size:80%;*/
+	overflow:auto;
+	width:150px;
+	height:80px; 
+}
+.comment-location-info {
+	font-size:80%;
+	overflow:auto;
+	width:200px;
+	height:140px;
+}
+.info-window-max {
+	/*font-size:80%;*/
+	overflow:auto;
+}
+
+
+/* Title link style */
+.locationinfo h2 a, .info-window-max h2 a {
+	text-decoration:none;
+	margin:0;
+	padding:0;
+}
+
