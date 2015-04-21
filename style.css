@@ -21,3 +21,15 @@
 .attachment .content-sidebar {
   display: block;
 }
+.full-size-link a:before {
+  content: "\f402";
+  margin-right: 1px;
+    -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font: normal 16px/1 Genericons;
+  text-decoration: inherit;
+  vertical-align: text-bottom;
+}
+.content-sidebar .entry-meta {
+	margin-bottom: 24px;
+}
