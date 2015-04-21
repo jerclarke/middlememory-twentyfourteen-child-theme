@@ -14,13 +14,28 @@
  GitHub Branch:	master
 */
 
+/*Grey background for mla_tag_cloud grid format*/
 .tag-cloud .tag-cloud-item {
 	background: #eee;
 }
+/*Reduce empty space above header 
+from  48px/72px to 24px/36px*/
+.content-area {
+	padding-top:24px;
+}
+@media screen and (min-width: 846px) {
+	.content-area {
+		padding-top:36px;
+	}
+}
 
+/*Unhide the content-sidebar inside body.attachment*/
 .attachment .content-sidebar {
   display: block;
 }
+/*Fix genericon for full-size-link when it's
+not in .site-content (main post well) so it
+can show in sidebar-content */
 .full-size-link a:before {
   content: "\f402";
   margin-right: 1px;
@@ -30,10 +45,30 @@
   text-decoration: inherit;
   vertical-align: text-bottom;
 }
+/*Bottom margin for entry-meta in sidebar-content*/
 .content-sidebar .entry-meta {
 	margin-bottom: 24px;
 }
 
+/**
+ * Make site-title and primary-navigation text bigger
+ * Was 18px/12px with no padding
+ */
+@media screen and (min-width: 783px) {
+	.site-title a, .site-title a:hover {
+		font-size: 20px;
+		padding-top: 6px;
+		padding-bottom: 6px;
+	}
+	.primary-navigation {
+		font-size: 14px;
+		padding-top: 6px;
+		padding-bottom: 6px;
+	}
+	.site-header .search-toggle {
+		padding: 6px;		
+	}
+}
 
 /**
  * MAKE FULL WIDTH PAGE TEMPLATE WORK
