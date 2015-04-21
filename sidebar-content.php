@@ -19,7 +19,7 @@ if (is_attachment()) :
 	 * SARAH: Show attachment categories and tags if they exist
 	 */
 	if (get_the_term_list( $post->ID, 'attachment_tag')) :
-		$content_sidebar_output .= 'Attachment Tags: <ul class="attachment-tags">';
+		$content_sidebar_output .= 'Attachment Tags (people): <ul class="attachment-tags">';
 		$content_sidebar_output .= get_the_term_list( $post->ID, 'attachment_tag', '<li>', '</li><li>', '</li>' );
 		$content_sidebar_output .= '</ul>';
 	endif;
@@ -31,7 +31,8 @@ if (is_attachment()) :
 	
 	$content_sidebar_output .= "<div class='entry-meta'>";
 	$content_sidebar_output .= "<span class='full-size-link'><a href='" . esc_url( wp_get_attachment_url() ) . "'> {$metadata['width']} &times; {$metadata['height']}</a></span>";
-	
+	if (get_edit_post_link())
+		$content_sidebar_output .= "<span class='edit-link'><a href='" . get_edit_post_link() . "'>Edit</a></span>";
 //	$content_sidebar_output .= "<br><span class='entry-date'>Uploaded <time class='entry-date' datetime='" . esc_attr( get_the_date( 'c' ) ) . "'>" . esc_html( get_the_date() ) . "</time></span>";
 
 	$content_sidebar_output .= "</div>";
