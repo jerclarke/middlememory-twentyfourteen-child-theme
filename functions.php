@@ -46,7 +46,16 @@ function sarah_between_entry_header_and_content_geomashup_main_map() {
 
 	echo GeoMashup::map(array(
 		'map_content' => 'global',
-	));	
+	));
+	
+	/**
+	 * Insert a special style to remove top padding form content-area
+	 * so that map is flush with top. 
+	 */
+	echo "<style type='text/css'>
+		.content-area {padding-top:0;}
+	</style>
+	";
 }
 add_action('sarah_between_entry_header_and_content', 'sarah_between_entry_header_and_content_geomashup_main_map');
 
