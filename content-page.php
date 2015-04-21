@@ -9,13 +9,13 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+	<?php do_action('sarah_between_entry_header_and_content');?>
 	<?php
 		// Page thumbnail and title.
 		twentyfourteen_post_thumbnail();
 		the_title( '<header class="entry-header"><h1 class="entry-title">', '</h1></header><!-- .entry-header -->' );
 	?>
 
-	<?php do_action('sarah_between_entry_header_and_content');?>
 	
 	<div class="entry-content">
 		<?php
