@@ -51,16 +51,16 @@ get_header();
 						/**
 						 * SARAH: Show attachment categories and tags if they exist
 						 */
-						if (get_the_term_list( $post->ID, 'attachment_tag')) :
-							echo 'Attachment Tags: <ul class="attachment-tags">';
-							echo get_the_term_list( $post->ID, 'attachment_tag', '<li>', '</li><li>', '</li>' );
-							echo '</ul>';
-						endif;
-						if (get_the_term_list( $post->ID, 'attachment_category')) :
-							echo 'Attachment Categories: <ul class="attachment-categories">';
-							echo get_the_term_list( $post->ID, 'attachment_category', '<li>', '</li><li>', '</li>' );
-							echo '</ul>';
-						endif;
+//						if (get_the_term_list( $post->ID, 'attachment_tag')) :
+//							echo 'Attachment Tags: <ul class="attachment-tags">';
+//							echo get_the_term_list( $post->ID, 'attachment_tag', '<li>', '</li><li>', '</li>' );
+//							echo '</ul>';
+//						endif;
+//						if (get_the_term_list( $post->ID, 'attachment_category')) :
+//							echo 'Attachment Categories: <ul class="attachment-categories">';
+//							echo get_the_term_list( $post->ID, 'attachment_category', '<li>', '</li><li>', '</li>' );
+//							echo '</ul>';
+//						endif;
 ?>
 					</div><!-- .entry-meta -->
 				</header><!-- .entry-header -->
@@ -137,5 +137,9 @@ get_header();
 	</section><!-- #primary -->
 
 <?php
+/**
+ * Sarah: Show content sidebar (not included in twenty-fourteen)
+ */
+get_sidebar( 'content' );
 get_sidebar();
 get_footer();
