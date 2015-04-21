@@ -140,3 +140,344 @@ function sarah_filter_body_class_for_attachments($classes) {
 	return $classes;
 }
 add_filter('body_class', 'sarah_filter_body_class_for_attachments', 1000);
+
+/**
+ * Beutified variable/array/object output for debugging
+ *
+ * Intellegently determines the type of data in $input and
+ * prints out a pleaseant rendering of its contents.
+ *
+ * Distinguishes between arrays, objects, strings, integers and booleans
+ * Otherwise states its not sure what $input is.
+ *
+ * $args is an array of optional parameters:
+ *	hide • Default false. If true wrap the output in <!--html comment tags--> instead of pretty divs.
+ *	title • Default false. H3 to show at the start of output explaning expectations/source
+ *	strip_tags • Default true, false to disable. HTML stripped from strings and print_r output.
+ *	truncate • Default 2000. False to disable. Strings will be truncated to this many characters.
+ *	excluded_children • Children of the passed-in object/array to NOT show. Can be array or a single key to exclude.
+ *   collapse • Whether to collapse array/object content by default or not.
+ *	echo • Default true. False will return HTML output instead of printing it to screen.
+ *
+ * @uses GV_ECHOR_CSS_USED bool Whether echor CSS has been used on this pageload yet to only output echor CSS on the first instance.
+ * @uses GV_ECHOR_JQUERY_USED bool Whether echor CSS has been used on this pageload yet to only output echor CSS on the first instance.
+ * @global <type> $gv
+ * @param <type> $input
+ * @param <type> $args
+ */
+function echor($input, $args = "") {
+	// See function doc for explanation of default arguments.
+	$defaults = array (
+		'hide' => false,
+		'title' => false, 
+	     'strip_tags' => true,
+	     'truncate' => 2000,
+		'excluded_children' => '',
+		'collapse' => false, 
+		'echo' => true,
+	);
+	$args = wp_parse_args($args, $defaults);
+	extract($args, EXTR_SKIP);
+
+	/**
+	 * Echor CSS, only inserted once per pageview, tracked by GV_ECHOR_CSS_USED constant
+	 */
+	if (!defined('GV_ECHOR_CSS_USED') and (!$hide AND $echo )) : 
+		?>
+		<style type="text/css">
+			.echor-container {
+				text-align:left;
+				margin:5px 5px 5px 0;
+				direction:ltr;
+			}
+			.echor {
+				padding:1em;
+				font-family: "Source Code Pro", monaco, courier,  verdana;
+				color: #333;
+				background-color: #FFF3C2;
+				font-size:11px;
+				line-height:1.2;
+				border: 2px solid #F1E19D;
+			}
+			.echor h3 {
+				margin: 0 0 5px 0;
+				padding: 0;
+				font-family: "Source Sans Pro", sans-serif;
+				font-size: 17px;
+				font-weight: normal;
+			}
+			.echor b {
+				font-weight: normal;
+				font-family: "Source Sans Pro", sans-serif;
+				font-size: 14px;
+			}
+			.echor pre {
+				margin: 5px 0;
+				white-space: pre-wrap;
+			}
+			.echor .calling-function {
+				font-size: 9px;
+				text-align:right;
+				padding: 5px 0 0 0 ;
+				color: #666;
+			}
+		</style>
+		<?php
+		// Set the constant to avoid showing CSS again
+		define('GV_ECHOR_CSS_USED', true);
+		
+	endif;
+
+	// Label shows above any content. Mandatory
+	$label = '';
+	// Echor content shows below label, optional if label covers it.
+	$echor_content = '';
+	
+	/**
+	 * Array or Object (enhanced print_r output)
+	 */
+	if (is_array($input) OR is_object($input)) :
+
+		$label = "Object";
+		if (is_array($input))
+			$label = "Array";
+
+		$input_count = count($input);
+
+		/**
+		 * Remove excluded children if requested
+		 */
+		if ($excluded_children) :
+			// Reformat as array with one element if it's just a string
+			if (!is_array($excluded_children))
+				$excluded_children = array($excluded_children);
+
+			/**
+			 * Remove excluded children by recreating the array/object with unwanted children replaced.
+			 */
+			// Array Style
+			if (is_array($input)) :
+				$input_copy = array();
+				foreach ($input as $key => $value) :
+					// If this element is not excluded add it to the copy
+					if (!in_array($key, $excluded_children))
+						$input_copy[$key] = $value;
+					 // Otherwise add a note that it was excluded
+					else
+						$input_copy[$key] = '•• VALUE EXCLUDED ••';
+				endforeach;
+			// Object style (has to be one or the other)
+			else :
+				$input_copy = new stdClass();
+				foreach ($input as $key =>$value) :
+					// If it is not in the excluded array then add it to the input_copy
+					 if (!in_array($key, $excluded_children))
+						$input_copy->$key = $value;
+					 // Otherwise add a note that it was excluded
+					 else
+						$input_copy->$key = '•• VALUE EXCLUDED ••';
+				endforeach;
+			endif;
+		// If we aren't excluding children just copy $input into $input_copy
+		else :
+			$input_copy = $input;
+		endif;
+
+		// Fetch the <pre>-formatted print_r output
+		$print_r_output = print_r($input_copy, 1);
+		// Convert it into an array of each line of the output
+		$print_r_lines = explode("\n", $print_r_output);
+		// Clear 3 spaces from the front of the print_r <pre> output, its unnecessary space
+		foreach ($print_r_lines as $key => $line)
+			$print_r_lines[$key] = substr($line, 3);
+
+		// Remove the first two and last two lines, they are unnecessary brackets and labels from print_r
+		array_shift($print_r_lines);
+		array_shift($print_r_lines);
+		array_pop($print_r_lines);
+		array_pop($print_r_lines);
+		// Turn the array of lines back into a string
+		$reformatted_print_r = implode("\n",$print_r_lines);
+
+		/**
+		 * Remove any HTML to avoid breaking the page
+		 */
+		if ($strip_tags)
+			$reformatted_print_r = strip_tags($reformatted_print_r);
+
+		/**
+		 * Add item count and show/hide button to label
+		 */
+		$label .= " ($input_count items) ";
+		// Add show/hide button to label 
+		if (!$hide)
+			$label .= " &middot; <small><a class=\"echor-toggle\">[show/hide]</a></small>";
+		
+		/**
+		 * Prepare content with print_r
+		 */
+		$echor_content = "<pre>$reformatted_print_r</pre> \n";
+
+	/**
+	 * String - Truncated and shown in <pre>
+	 */
+	elseif ( is_string($input) ) :
+
+		/**
+		 * If it's empty then say so in words
+		 */
+		if (empty($input)) :
+			$label = ' <i>is_string() but empty</i>';
+		else :
+			$label = '<b>String: </b>';
+		endif;
+
+		/**
+		 * Remove any HTML to avoid breaking the page with strange string
+		 * Pass 'strip_tags=0' into echor to disable this and output whatever html was in $input
+		 */
+		if ($strip_tags)
+			$input = strip_tags($input);
+
+		/**
+		 * If it's long and $truncate is active condense the string to it's start and end.
+		 * Pass 'truncate=0' into echor to turn off truncation for that instance,
+		 * or pass in a larger number that suits your specific task.
+		 */
+		if ($truncate) :
+			// Default truncation length is 2000
+			$text_truncation_length = $truncate;
+			$text_truncation_half = (int) $truncate / 2;
+
+			if (strlen($input) > $text_truncation_length) :
+
+				// Copy the last $text_truncation_half characters (start -$text_truncation_half from the end, copy $text_truncation_half chars) of the string
+				$end_of_string = substr($input, -$text_truncation_half, $text_truncation_half);
+				// Cut the $input to only it's first 500 characters
+				$start_of_string = substr($input, 0, 1000);
+				// Tack the ending onto the starting
+				$input = $start_of_string . "\n\n • TRUNCATED • \n\n" . $end_of_string;
+
+			endif;
+		endif; // $truncate
+
+
+		$echor_content = "<pre>$input</pre>";
+
+	/**
+	 * Integers
+	 */
+	elseif ( is_int($input) AND $input) :
+		$label = "<b>Integer • $input</b> ";
+
+	/**
+	 * Float number
+	 */
+	elseif (is_float($input)) :
+		$label = "<b>Float • $input</b>";
+
+	/**
+	 * Numeric Zero
+	 */
+	elseif ($input === 0) :
+		$label = '<b>0 === $input</b>';
+
+	/**
+	 * Boolean False
+	 */
+	elseif ($input === FALSE) :
+		$label = '<b>false === $input</b>';
+
+	/**
+	 * Boolean True
+	 */
+	elseif ($input === TRUE) :
+		$label = '<b>true === $input</b>';
+
+	/**
+	 * Undefined variable
+	 */
+	elseif (!$input) :
+		$label = '<i>Undefined or empty value</i>';
+
+	/**
+	 * Other defined value
+	 */
+	elseif ($input) :
+		$label = "Not sure what it is • $input";
+	endif;
+	
+	/**
+	 * Determine the calling function 
+	 */
+	$debug_backtrace = debug_backtrace();
+	$calling_function = $debug_backtrace[1]['function'];
+
+	$final_output = '';
+	$extra_css_classes = '';
+	
+	/**
+	 * Hide mode with $output wrapped in HTML comments
+	 */
+	if ($hide) :
+
+		$final_output .= "<!-- ECHOR (SET TO SILENT) \n";
+		if ($title)
+			$final_output .= " $title \n";
+		$final_output .= "\n $label \n \n";
+		$final_output .= "\n $echor_content \n \n";
+		$final_output .= " -->\n";
+	
+	/**
+	 * Non-Hidden printout using divs
+	 */
+	else :
+		/**
+		 * Add the echor collapsed class so that this will start as closed
+		 */
+		if ($collapse) 
+			$extra_css_classes .= "echor-collapsed ";
+		
+		$final_output .= "<div class='echor-container'>\n";
+		$final_output .= "<div class='echor'> \n";
+		if ($title)
+			$final_output .= "<h3>{$args['title']}</h3> \n";
+		if ($label)
+			$final_output .= "<span class='echor-label'>$label</span>";
+		if ($echor_content)
+			$final_output .= "<div class='echor-content $extra_css_classes'>$echor_content</div>";
+//		$final_output .= $output;
+		$final_output .= "<p class='calling-function'> $calling_function()</p>";
+		$final_output .= "</div><!--.echor-->\n";
+		$final_output .= "</div><!--#echor-container-->\n";
+	endif;
+	
+	/**
+	 * Output Echor jQuery code only once per pageload, tracked by GV_ECHOR_JQUERY_USED
+	 */
+	if (!defined('GV_ECHOR_JQUERY_USED') and $collapse ) : 
+			$final_output .= "
+			<script type='text/javascript'>{
+				jQuery(document).ready(function($) {
+					// Hide any initially-collapsed echors
+					$('.echor-collapsed').hide();
+					// Make the toggle button toggle the content of the current echor
+					$('.echor-toggle').click(function() {
+					   // Get the parent echor, then find it's child .echor-content and toggle it
+					   $(this).parents('.echor').children('.echor-content').toggle();
+					});
+					
+				}); // end document.ready				
+			}</script>";
+		// Set the constant to avoid showing this again
+		define('GV_ECHOR_JQUERY_USED', true);
+	endif;
+	
+	/**
+	 * Echo or return output
+	 */
+	if ($echo)
+		echo $final_output;
+	else
+		return $final_output;
+}
