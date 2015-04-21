@@ -13,3 +13,11 @@
  GitHub Theme URI: https://github.com/jeremyclarke/middlememory-twentyfourteen-child-theme
  GitHub Branch:	master
 */
+
+.tag-cloud .tag-cloud-item {
+	background: #eee;
+}
+
+.attachment .content-sidebar {
+  display: block;
+}
