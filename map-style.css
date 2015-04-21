@@ -18,7 +18,8 @@ h2 {
 }
 h2 a {
 	margin-bottom: .5em;
-	color: #aaa;
+	color: #999;
+	font-weight: 100;
 }
 
 .map-post-summary {
