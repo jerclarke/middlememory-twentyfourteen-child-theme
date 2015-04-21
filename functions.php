@@ -123,3 +123,20 @@ function sarah_filter_geo_mashup_locations_where($where) {
 }
 add_filter( 'geo_mashup_locations_where', 'sarah_filter_geo_mashup_locations_where');
 
+/**
+ * Filter body_class to remove full-width when is_attachment
+ * 
+ * 'full-width' is added by twentyfourteen_body_classes because it assumes you'll never
+ * want to use sidebar-content on attachments. We do use it there so we need to remove the
+ * class as well as adding get_sidebar('content') to image.php 
+ * 
+ * @param type $classes
+ * @return type
+ */
+function sarah_filter_body_class_for_attachments($classes) {
+	if (is_attachment()) 	
+		$classes = array_diff($classes, array('full-width'));
+	
+	return $classes;
+}
+add_filter('body_class', 'sarah_filter_body_class_for_attachments', 1000);
