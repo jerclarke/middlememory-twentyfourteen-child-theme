@@ -10,11 +10,11 @@
 /**
  * On attachment pages add attachment tags and categories in the sidebar
  */
+$content_sidebar_output = '';
 if (is_attachment()) :
 //	echo 'is_attachment';
 	$metadata = wp_get_attachment_metadata();
 
-	$content_sidebar_output = '';
 	/**
 	 * SARAH: Show attachment categories and tags if they exist
 	 */
