@@ -114,6 +114,42 @@ function sarah_filter_wp_get_attachment_link($output, $id, $size, $permalink, $i
 add_filter('wp_get_attachment_link', 'sarah_filter_wp_get_attachment_link', 10, 6);
 
 /**
+ * Filter attributes of [mla_gallery] to enable Fullscreen Galleria mode by default
+ * 
+ * Fullscreen Galleria plugin hooks into [gallery] and requires [gallery link='file'] to function. 
+ * 
+ * We use [mla_gallery] instead, which requires mla_alt_shortcode="gallery" to load as [gallery]. 
+ * 
+ * SO: We filter attributes of [mla_gallery] to add mla_alt_shortcode="gallery" AND link="file" attributes. 
+ * BUT: We only do so if Fullscreen Galleria plugin is enabled 
+ * AND: We never do it if 'mla_output' attribute is present because it means MLA is outputting something 
+ * other than a normal gallery.
+ * NOTE: There may be other uses of [mla_gallery] that need to be excluded, mla_output was just the one I found.
+ * 
+ * @param type $atts
+ * @return string
+ */
+function sarah_filter_mla_gallery_raw_attributes($atts) {
+	
+	// Only filter atts if Fullscreen Galleria is active
+	if (!is_plugin_active('fullscreen-galleria/galleria-fs.php')) 
+		return $atts;
+
+	// Don't filter atts if 'mla_output' attribute is set (causes Notices/Warnings)
+	if (isset($atts['mla_output']))
+		return $atts;
+	
+	// Insert mla_alt_shortcode=gallery so MLA uses default [gallery] output
+	$atts['mla_alt_shortcode'] = 'gallery';
+	
+	// Insert link="file" to make Fullscreen Galleria work properly
+	$atts['link'] = 'file';
+	
+	return $atts;
+}
+add_filter('mla_gallery_raw_attributes', 'sarah_filter_mla_gallery_raw_attributes');
+
+/**
  * SARAH: Filter geo mashup 'where' clause to insert 'inherit' as a valid status when attachments are being queried
  *
  * By default geo mashup queries for attachments when post_type=all but only fetches
