@@ -3,7 +3,6 @@
  * Functions.php for Middle Memory child theme based on Twenty Fourteen
  */
 
-
 /**
  * SARAH: Set this up as child theme of twentyfourteen
  */
@@ -22,28 +21,47 @@ function wpa82573_show_tax_attachments( $query ) {
 }
 add_action( 'pre_get_posts', 'wpa82573_show_tax_attachments' );
 
-
+/**
+ * Display Geo Mashup global map during 'sarah_between_entry_header_and_content' action if we're on the "Global Mashup Page"
+ * 
+ * Geo Mashup plugin has a setting for "Global Mashup Page" which should contain a big map of all posts. 
+ * On this page we want a full screen map so we need to put it above the main post content so we can't use the post editor. 
+ * 
+ * In our child theme we duplicated the content-page.php file and added an action in the full-width section of the header:
+ * do_action('sarah_between_entry_header_and_content');
+ * 
+ * This function inserts a global map in that action if the current page is the Global Mashup page. 
+ * 
+ * 
+ * @global object $geo_mashup_options
+ * @return echo
+ */
 function sarah_between_entry_header_and_content_geomashup_main_map() {
 	global $geo_mashup_options;
-	
-	if (!is_page())
-		return;
 
-	if (!class_exists('GeoMashupOptions') OR !isset($geo_mashup_options) OR !is_object($geo_mashup_options))
+	/**
+	 * Exit the action if this isn't a page or if Geo Mashup isn't active
+	 */
+	if (!is_page() OR !class_exists('GeoMashupOptions') OR !isset($geo_mashup_options) OR !is_object($geo_mashup_options))
 		return;
 	
-	
+	/**
+	 * Get the Mashup page ID and exit if it isn't set up
+	 */
 	$mashup_page_id = $geo_mashup_options->get( 'overall', 'mashup_page' );
-	
 	if (!$mashup_page_id OR is_wp_error($mashup_page_id))
 		return;
 	
-	
-	$current_page_id = get_queried_object_id();
-	
+	/**
+	 * Get the current page and exit if it isn't the Global Mashup Page
+	 */
+	$current_page_id = get_queried_object_id();	
 	if ($current_page_id != $mashup_page_id)
 		return;
 
+	/**
+	 * Show a global map!
+	 */
 	echo GeoMashup::map(array(
 		'map_content' => 'global',
 	));
