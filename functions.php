@@ -219,6 +219,7 @@ add_filter('body_class', 'sarah_filter_body_class_for_attachments', 1000);
  * @param <type> $input
  * @param <type> $args
  */
+if (!function_exists('echor')):
 function echor($input, $args = "") {
 	// See function doc for explanation of default arguments.
 	$defaults = array (
@@ -535,3 +536,4 @@ function echor($input, $args = "") {
 	else
 		return $final_output;
 }
+endif; // function_exists(echor)
